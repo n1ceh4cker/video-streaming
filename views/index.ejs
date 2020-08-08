@@ -14,9 +14,11 @@
     <%- include ('./partials/messages') %>
     <header class="header">
         <h3>Upload file</h3>
-        <form action="/upload" method="post">
+        <form action="/upload" method="post" enctype="multipart/form-data">
             <label for="title">Title</label>
             <input type="text" name="title" id="title" >
+            <label for="video">video</label>
+            <input type="file" name="myvideo" id="video" >
             <input class="b" type="submit" value="Upload">
         </form>
         
