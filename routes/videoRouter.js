@@ -1,9 +1,9 @@
 const router = require('express').Router()
 const request = require('request')
-const e = require('express')
 const fs = require('fs')
 const path = require('path')
 const multer = require('multer')
+const { checkAuthenticated , checkSuperAuthenticated } = require('./userRouter')
 
 let filename = ''
 const storage = multer.diskStorage({
@@ -25,11 +25,11 @@ const upload = multer({
 		const mimetype = filetype.test(file.mimetype)
 		const extname = filetype.test(path.extname(file.originalname.toLowerCase()))
 		if(mimetype && extname) return cb(null,true)
-		cb('file can be only mp4 type')
+		cb('File can be only .mp4 type && upto 10MB')
 	}
 }).single('myvideo')
 
-router.get('/',(req,res)=>{
+router.get('/',checkAuthenticated, (req,res)=>{
     const options = {
         method: 'GET',
         url: 'https://dev.vdocipher.com/api/videos',
@@ -50,7 +50,7 @@ router.get('/',(req,res)=>{
     })
 })
 
-router.get('/play/:id', (req,res)=>{
+router.get('/play/:id', checkAuthenticated, (req,res)=>{
     const id = req.params.id
     const options = {
         method: 'POST',
@@ -75,13 +75,34 @@ router.get('/play/:id', (req,res)=>{
 
     })
 })
-router.post('/upload',(req,res)=>{
-    console.log(`https://${req.hostname}:3000/cb`)
+
+router.get('/admin', checkSuperAuthenticated, (req, res)=>{
+    const options = {
+        method: 'GET',
+        url: 'https://dev.vdocipher.com/api/videos',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: 'Apisecret 0fSSCjtWzvm6UCJS1rSHEK7ikkCcHhy1m6803sxiEt9cqDCRR3lDxlMsa0sxojXe'
+        }
+    }
+    request(options,(error, response, body)=>{
+        if(error){
+            console.log(error)
+        }else{
+        
+            res.render('admin.ejs',{videos: JSON.parse(body).rows} )
+        }
+
+    })
+})
+
+router.post('/upload',checkSuperAuthenticated, (req,res)=>{
     let options = {}
     upload(req, res ,(err)=>{
         if(err){
-            console.log(err)
-            res.redirect('/')
+            req.flash('error_msg', err)
+            res.redirect('/admin')
         }else{
             options = {
                 method: 'PUT',
@@ -95,12 +116,12 @@ router.post('/upload',(req,res)=>{
             }
             request(options,(error, response, body)=>{
                 if(error){
-                    console.log(error)
-                    res.redirect('/')
+                    req.flash('error_msg', error)
+                    res.redirect('/admin')
                 }else{
                     if(typeof JSON.parse(body).message=='string'){
                         req.flash('error_msg',JSON.parse(body).message)
-                        res.redirect('/')
+                        res.redirect('/admin')
                     }else{
                         const clientPayload = JSON.parse(body).clientPayload
                         options = {
@@ -121,12 +142,12 @@ router.post('/upload',(req,res)=>{
                         }
                         request(options, (error, response, body)=>{
                             if(error){
-                                console.log(error)
-                                res.redirect('/')
+                                req.flash('error_msg', error)
+                                res.redirect('/admin')
                             }else{
                                 console.log(body)
                                 req.flash('success_msg', 'Video uploaded successfully')
-                                res.redirect('/')
+                                res.redirect('/admin')
                             }
                         })
                     }          
@@ -138,9 +159,9 @@ router.post('/upload',(req,res)=>{
     
 })
 
-router.get('/cb',(req, res)=>{
+router.get('/cb',checkSuperAuthenticated, (req, res)=>{
     req.flash('success_msg', 'Video uploaded successfully')
-    res.redirect('/')
+    res.redirect('/admin')
 })
 
 module.exports = router
