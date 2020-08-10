@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play</title>
+</head>
+<body>
+    <div id="embedBox" style="width:auto;max-width:100%;height:100vh;"></div> 
+    <script> 
+    (function(v,i,d,e,o){
+        v[o]=v[o]||{};
+        v[o].add = v[o].add || function V(a){ (v[o].d=v[o].d||[]).push(a);};
+        if(!v[o].l) {
+            v[o].l=1*new Date();
+            a=i.createElement(d), m=i.getElementsByTagName(d)[0];
+            a.async=1;
+            a.src=e; 
+            m.parentNode.insertBefore(a,m);
+        } })
+        (window,document,"script","https://cdn-gce.vdocipher.com/playerAssets/1.6.10/vdo.js","vdo"); vdo.add({ otp: "<%=video.otp%>", playbackInfo: "<%=video.playbackInfo%>", theme: "9ae8bbe8dd964ddc9bdb932cca1cb59a", container: document.querySelector( "#embedBox" ), }); 
+    </script>
+</body>
+</html>

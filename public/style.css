@@ -1,0 +1,18 @@
+.img-div{
+    height: 200px;
+    overflow: hidden;
+    background-color: rgb(222, 236, 236);
+}
+.card-text{
+    color: #222222
+}
+
+#particles-js{
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: firebrick;
+}
